@@ -135,7 +135,7 @@ const clientPath = path.join(__dirname, '..', 'public');
 app.use(express.static(clientPath));
 
 // Fallback for React Router (using the correct wildcard syntax for newer Express)
-app.get('/*', (req, res) => {
+app.get('*', (req, res) => {
   res.sendFile(path.join(clientPath, 'index.html'));
 });
 
