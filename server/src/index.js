@@ -5,7 +5,14 @@ const express = require('express');
 const cors = require('cors');
 const { Server } = require('socket.io');
 
-const { readContent, saveContent } = require('./contentStore');
+const { readDefaultContent } = require('./contentStore');
+const {
+  initDb,
+  getUserByUsername,
+  createUser,
+  getUserById,
+  setUserContent,
+} = require('./db');
 const {
   createSession,
   getClue,
@@ -22,26 +29,136 @@ const {
 } = require('./gameModel');
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3010;
+const authTokens = new Map();
 
 const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: '1mb' }));
 
-app.get('/api/content', (req, res) => {
+function normalizeUsername(value) {
+  return String(value || '').trim();
+}
+
+function hashPassword(password, salt) {
+  return crypto.pbkdf2Sync(password, salt, 120000, 64, 'sha512').toString('hex');
+}
+
+function createToken() {
+  return crypto.randomBytes(24).toString('hex');
+}
+
+function createAuthResponse(user) {
+  const token = createToken();
+  authTokens.set(token, user.id);
+  return {
+    token,
+    user: {
+      id: user.id,
+      username: user.username,
+    },
+  };
+}
+
+async function resolveContentForUser(userId) {
+  const user = await getUserById(userId);
+  const fallback = readDefaultContent();
+  if (!user?.content_json) return fallback;
   try {
-    res.json(readContent());
+    const parsed = JSON.parse(user.content_json);
+    if (!parsed || !Array.isArray(parsed.boards)) return fallback;
+    return parsed;
+  } catch (err) {
+    return fallback;
+  }
+}
+
+async function requireAuth(req, res, next) {
+  try {
+    const auth = String(req.headers.authorization || '');
+    if (!auth.startsWith('Bearer ')) return res.status(401).json({ error: 'Unauthorized' });
+    const token = auth.slice('Bearer '.length).trim();
+    const userId = authTokens.get(token);
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    const user = await getUserById(userId);
+    if (!user) {
+      authTokens.delete(token);
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    req.auth = { token, user };
+    return next();
+  } catch (err) {
+    return res.status(500).json({ error: 'Authentication failed' });
+  }
+}
+
+app.post('/api/auth/signup', async (req, res) => {
+  try {
+    const username = normalizeUsername(req.body?.username);
+    const password = String(req.body?.password ?? '');
+    if (username.length < 3 || username.length > 24) {
+      return res.status(400).json({ error: 'Username must be 3-24 characters' });
+    }
+    if (password.length < 6 || password.length > 128) {
+      return res.status(400).json({ error: 'Password must be 6-128 characters' });
+    }
+
+    const existing = await getUserByUsername(username);
+    if (existing) return res.status(409).json({ error: 'Username already exists' });
+
+    const salt = crypto.randomBytes(16).toString('hex');
+    const passwordHash = hashPassword(password, salt);
+    const defaultContent = readDefaultContent();
+    const user = await createUser({
+      username,
+      passwordHash,
+      passwordSalt: salt,
+      contentJson: JSON.stringify(defaultContent),
+    });
+    return res.json(createAuthResponse(user));
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to sign up' });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const username = normalizeUsername(req.body?.username);
+    const password = String(req.body?.password ?? '');
+    const user = await getUserByUsername(username);
+    if (!user) return res.status(401).json({ error: 'Invalid username or password' });
+    const passwordHash = hashPassword(password, user.password_salt);
+    if (passwordHash !== user.password_hash) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+    return res.json(createAuthResponse(user));
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to log in' });
+  }
+});
+
+app.post('/api/auth/logout', requireAuth, (req, res) => {
+  authTokens.delete(req.auth.token);
+  res.json({ ok: true });
+});
+
+app.get('/api/auth/me', requireAuth, (req, res) => {
+  res.json({ user: { id: req.auth.user.id, username: req.auth.user.username } });
+});
+
+app.get('/api/content', requireAuth, async (req, res) => {
+  try {
+    const content = await resolveContentForUser(req.auth.user.id);
+    res.json(content);
   } catch (err) {
     res.status(500).json({ error: 'Failed to read content' });
   }
 });
 
-app.post('/api/content', (req, res) => {
+app.post('/api/content', requireAuth, async (req, res) => {
   try {
     const next = req.body;
-    if (!next || !Array.isArray(next.boards)) {
-      return res.status(400).json({ error: 'Invalid content format' });
-    }
-    saveContent(next);
+    if (!next || !Array.isArray(next.boards)) return res.status(400).json({ error: 'Invalid content format' });
+    await setUserContent(req.auth.user.id, JSON.stringify(next));
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to save content' });
@@ -75,10 +192,10 @@ function allocateUniqueLobbyCode() {
   return `${generateLobbyCode()}${generateLobbyCode()}`.slice(0, 8);
 }
 
-app.post('/api/sessions', (req, res) => {
+app.post('/api/sessions', requireAuth, async (req, res) => {
   try {
     const sessionId = crypto.randomUUID();
-    const contentSnapshot = readContent();
+    const contentSnapshot = await resolveContentForUser(req.auth.user.id);
     const session = createSession(sessionId, contentSnapshot);
     sessions.set(sessionId, session);
     const lobbyCode = allocateUniqueLobbyCode();
@@ -321,9 +438,16 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`Jeopardy server listening on http://localhost:${PORT}`);
-});
+initDb()
+  .then(() => {
+    server.listen(PORT, () => {
+      console.log(`Jeopardy server listening on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to initialize database', err);
+    process.exit(1);
+  });
 
 let shuttingDown = false;
 function shutdown(signal) {

@@ -23,6 +23,13 @@ export default function LobbyCodeLanding() {
     inputRef.current?.focus();
   }, []);
 
+  useEffect(() => {
+    document.body.classList.add('lobbyNoScroll');
+    return () => {
+      document.body.classList.remove('lobbyNoScroll');
+    };
+  }, []);
+
   const normalized = useMemo(() => normalizeCode(code).slice(0, 6), [code]);
 
   const chars = useMemo(() => {
@@ -63,7 +70,7 @@ export default function LobbyCodeLanding() {
     return () => {
       cancelled = true;
     };
-  }, [normalized, navigate]);
+  }, [normalized, navigate, SERVER_URL]);
 
   return (
     <div className="lobbyScreen">

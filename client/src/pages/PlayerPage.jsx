@@ -101,7 +101,7 @@ export default function PlayerPage() {
             </div>
           </div>
 
-          <div className="card playerBuzzCard">
+          <div className="playerBuzzCard">
             <button
               className={
                 'playerBuzzBtn' +
@@ -129,7 +129,7 @@ export default function PlayerPage() {
           <table className="board">
             <thead>
               <tr>
-                <th style={{ width: 40 }}></th>
+                <th className="boardRowIndexHead"></th>
                 {board.categories.map((cat) => (
                   <th key={cat.name}>{cat.name}</th>
                 ))}
@@ -138,7 +138,7 @@ export default function PlayerPage() {
             <tbody>
               {Array.from({ length: 5 }).map((_, clueRowIdx) => (
                 <tr key={clueRowIdx}>
-                  <td style={{ fontWeight: 200, color: 'var(--fg)', fontSize: 13 }}>{clueRowIdx + 1}</td>
+                  <td className="boardRowIndex">{clueRowIdx + 1}</td>
                   {board.categories.map((cat, categoryIndex) => {
                     const clueId = makeClueId(boardIndex, categoryIndex, clueRowIdx);
                     const used = Boolean(usedForBoard?.[clueId]);

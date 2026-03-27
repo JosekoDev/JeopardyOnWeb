@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getServerUrl } from '../lib/serverUrl';
-
-const SERVER_URL = getServerUrl();
+import { apiFetch } from '../lib/auth';
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -37,7 +35,7 @@ export default function EditorPage() {
       setLoading(true);
       setError('');
       try {
-        const res = await fetch(`${SERVER_URL}/api/content`);
+        const res = await apiFetch('/api/content', {}, true);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         // Ensure every board has a multiplier
@@ -47,13 +45,15 @@ export default function EditorPage() {
         setContent(data);
         savedSnapshot.current = JSON.stringify(data);
       } catch (err) {
-        setError(err?.message || 'Failed to load content');
+        const msg = err?.message || 'Failed to load content';
+        setError(msg);
+        if (msg.toLowerCase().includes('sign in')) navigate('/host', { replace: true });
       } finally {
         setLoading(false);
       }
     }
     load();
-  }, []);
+  }, [navigate]);
 
   function markDirty() {
     setDirty(true);
@@ -97,11 +97,10 @@ export default function EditorPage() {
     setSavedMsg('');
     setError('');
     try {
-      const res = await fetch(`${SERVER_URL}/api/content`, {
+      const res = await apiFetch('/api/content', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(content),
-      });
+      }, true);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setSavedMsg('Saved');
       setDirty(false);

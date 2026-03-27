@@ -89,7 +89,7 @@ export default function HostBoard() {
     <div className="container">
       <div className="lobbyTopRight">{lobbyCode ? `Lobby Code: ${lobbyCode}` : ''}</div>
       <div className="topRow">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div className="hostBoardHeaderMain">
           <div>
             <div style={{ fontWeight: 300, fontSize: 18, letterSpacing: '-0.01em' }}>Board {boardIndex + 1} of {state?.boards?.length ?? '?'}</div>
             <div className="small">{sessionId.slice(0, 8)}…</div>
@@ -115,7 +115,7 @@ export default function HostBoard() {
               <table className="board">
                 <thead>
                   <tr>
-                    <th style={{ width: 50 }}></th>
+                  <th className="boardRowIndexHead"></th>
                     {board.categories.map((cat) => (
                       <th key={cat.name}>{cat.name}</th>
                     ))}
@@ -124,7 +124,7 @@ export default function HostBoard() {
                 <tbody>
                   {Array.from({ length: 5 }).map((_, clueRowIdx) => (
                     <tr key={clueRowIdx}>
-                      <td style={{ fontWeight: 200, color: 'var(--fg-dim)', fontSize: 13 }}>{clueRowIdx + 1}</td>
+                      <td className="boardRowIndex">{clueRowIdx + 1}</td>
                       {board.categories.map((cat, categoryIndex) => {
                         const clueId = makeClueId(boardIndex, categoryIndex, clueRowIdx);
                         const used = Boolean(usedForBoard?.[clueId]);

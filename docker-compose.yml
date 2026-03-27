@@ -1,10 +1,10 @@
-version: '3.8'
-
 services:
   jeopardy:
     build: .
     ports:
       - "3010:3010"
+    volumes:
+      - ./data:/app/data
     environment:
       - NODE_ENV=production
     restart: unless-stopped
