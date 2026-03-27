@@ -175,6 +175,3 @@ Client:
   - allow inbound TCP `3010` in firewall
 - If audio does not play on first interaction:
   - interact with page first (browser autoplay policies can block initial playback)
-
-# JeopardyOnWeb
-WebApp that allows hosting and joining of a rendition of the hit gameshow "Jeopardy"
