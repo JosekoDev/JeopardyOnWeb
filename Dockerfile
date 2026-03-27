@@ -17,6 +17,7 @@ RUN cd server && npm ci --production
 
 COPY server/ ./server/
 COPY data/ ./data/
+COPY audio/ ./audio/
 # Copy built client to server public directory
 COPY --from=builder /app/client/dist ./server/public/
 
