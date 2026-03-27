@@ -9,8 +9,8 @@ export function getServerUrl() {
   if (typeof window === 'undefined') return '';
 
   const { protocol, hostname, port } = window.location;
-  // If app is served by the Node server, keep same-origin requests.
-  if (port === '3010') return '';
+  // Use same-origin when served from production/tunnel/LAN (no explicit dev port).
+  if (!port || port === '3010') return '';
 
   // During dev/preview, route API/socket traffic to the same machine's server.
   return `${protocol}//${hostname}:3010`;
