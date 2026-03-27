@@ -134,8 +134,8 @@ app.get('/api/lobbies/:lobbyCode/exists', (req, res) => {
 const clientPath = path.join(__dirname, '..', 'public');
 app.use(express.static(clientPath));
 
-// Fallback for React Router (using the correct wildcard syntax for newer Express)
-app.get('*', (req, res) => {
+// Fallback for React Router (using RegExp to bypass path-to-regexp syntax errors in newer Express)
+app.get(/.*/, (req, res) => {
   res.sendFile(path.join(clientPath, 'index.html'));
 });
 
