@@ -17,6 +17,7 @@ const SFX_FILES = {
 };
 
 const audioCache = new Map();
+const activePlayers = new Set();
 
 function makeSrc(fileName) {
   const base = getServerUrl();
@@ -34,11 +35,21 @@ function getAudio(name) {
 }
 
 export function playSfx(name) {
-  const audio = getAudio(name);
-  if (!audio) return;
+  const template = getAudio(name);
+  if (!template) return;
   try {
-    audio.currentTime = 0;
-    void audio.play();
+    // Use a fresh audio instance per play so navigation/state changes
+    // don't interrupt the currently playing sound.
+    const audio = template.cloneNode(true);
+    activePlayers.add(audio);
+    const cleanup = () => {
+      activePlayers.delete(audio);
+      audio.removeEventListener('ended', cleanup);
+      audio.removeEventListener('error', cleanup);
+    };
+    audio.addEventListener('ended', cleanup);
+    audio.addEventListener('error', cleanup);
+    void audio.play().catch(() => cleanup());
   } catch (err) {
     // Ignore autoplay/user-gesture playback restrictions.
   }
