@@ -351,9 +351,15 @@ body {
   min-width: 540px;
   display: flex;
   align-items: stretch;
+  min-height: 0;
 }
 
 .hostBoardPane .board { height: 100%; }
+.boardScrollWrap {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
 
 .hostRightPane {
   width: 360px;
@@ -428,6 +434,19 @@ body {
   justify-content: flex-start;
   padding: 24px;
   animation: fadeInUp 0.4s var(--ease);
+}
+.hostClueSplit {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.hostClueMainPane {
+  flex: 1;
+  min-width: 0;
+}
+.hostClueSidePane {
+  width: 360px;
+  max-width: 100%;
 }
 
 .hostClueMeta {
@@ -1139,6 +1158,125 @@ textarea { min-height: 70px; resize: vertical; }
 
   .dailyDoubleText {
     font-size: 42px;
+  }
+}
+
+@media (max-width: 760px) {
+  .container {
+    padding: 14px 10px;
+  }
+
+  .topRow {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .hostClueSplit {
+    flex-direction: column;
+  }
+
+  .hostClueSidePane {
+    width: 100%;
+  }
+
+  .hostBoardPane {
+    min-width: 0;
+  }
+
+  .board {
+    border-spacing: 2px;
+  }
+
+  .board th {
+    font-size: 10px;
+    padding: 6px 4px;
+    letter-spacing: 0.02em;
+  }
+
+  .clueCell {
+    font-size: 15px;
+    padding: 10px 4px;
+  }
+
+  .hostClueText {
+    font-size: 21px;
+    line-height: 1.3;
+    max-width: 100%;
+  }
+
+  .hostAnswerText {
+    font-size: 18px;
+    max-width: 100%;
+  }
+
+  .playerClueText {
+    font-size: 22px;
+    line-height: 1.3;
+    max-width: 100%;
+  }
+
+  .playerBuzzBtn {
+    font-size: 30px;
+    padding: 16px 14px;
+    letter-spacing: 0.08em;
+  }
+
+  .lobbyCodeCellsBig {
+    gap: 8px;
+    min-height: 72px;
+    grid-template-columns: repeat(6, minmax(34px, 1fr));
+    width: min(96vw, 420px);
+  }
+
+  .lobbyCodeCellBig {
+    height: 68px;
+    padding-bottom: 8px;
+  }
+
+  .lobbyCodeCharBig {
+    font-size: 36px;
+  }
+
+  .usernameRow {
+    gap: 8px;
+    min-height: 76px;
+  }
+
+  .usernameUnderline {
+    height: 66px;
+    padding-bottom: 6px;
+  }
+
+  .usernameText {
+    font-size: 34px;
+  }
+
+  .usernameCaret {
+    height: 26px;
+    margin-bottom: 7px;
+  }
+
+  .lobbyBottomLeft,
+  .lobbyTopRight {
+    position: static;
+    margin-top: 12px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .dailyDoubleText {
+    font-size: 30px;
+    text-align: center;
+    padding: 0 14px;
+  }
+
+  .roundEndRow {
+    font-size: 18px;
+    gap: 10px;
+    padding: 0 12px;
+    max-width: 100%;
+    overflow-wrap: anywhere;
   }
 }
 

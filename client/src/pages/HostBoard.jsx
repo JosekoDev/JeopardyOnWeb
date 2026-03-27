@@ -111,47 +111,49 @@ export default function HostBoard() {
       <div className="hostSplit">
         <div className="hostBoardPane">
           {board ? (
-            <table className="board">
-              <thead>
-                <tr>
-                  <th style={{ width: 50 }}></th>
-                  {board.categories.map((cat) => (
-                    <th key={cat.name}>{cat.name}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {Array.from({ length: 5 }).map((_, clueRowIdx) => (
-                  <tr key={clueRowIdx}>
-                    <td style={{ fontWeight: 200, color: 'var(--fg-dim)', fontSize: 13 }}>{clueRowIdx + 1}</td>
-                    {board.categories.map((cat, categoryIndex) => {
-                      const clueId = makeClueId(boardIndex, categoryIndex, clueRowIdx);
-                      const used = Boolean(usedForBoard?.[clueId]);
-                      const isDD = Boolean(state?.dailyDoubles?.[clueId]);
-                      const displayVal = getDisplayValue(state, clueId);
-                      let className = used ? 'clueCell used' : 'clueCell';
-                      if (!used && isDD) className += ' dailyDoubleGlow';
-                      return (
-                        <td key={clueId}>
-                          <div
-                            role="button"
-                            tabIndex={0}
-                            className={className}
-                            onClick={() => (used ? null : onClueClick(categoryIndex, clueRowIdx))}
-                            onKeyDown={(e) => {
-                              if (used) return;
-                              if (e.key === 'Enter' || e.key === ' ') onClueClick(categoryIndex, clueRowIdx);
-                            }}
-                          >
-                            {used ? '·' : displayVal}
-                          </div>
-                        </td>
-                      );
-                    })}
+            <div className="boardScrollWrap">
+              <table className="board">
+                <thead>
+                  <tr>
+                    <th style={{ width: 50 }}></th>
+                    {board.categories.map((cat) => (
+                      <th key={cat.name}>{cat.name}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {Array.from({ length: 5 }).map((_, clueRowIdx) => (
+                    <tr key={clueRowIdx}>
+                      <td style={{ fontWeight: 200, color: 'var(--fg-dim)', fontSize: 13 }}>{clueRowIdx + 1}</td>
+                      {board.categories.map((cat, categoryIndex) => {
+                        const clueId = makeClueId(boardIndex, categoryIndex, clueRowIdx);
+                        const used = Boolean(usedForBoard?.[clueId]);
+                        const isDD = Boolean(state?.dailyDoubles?.[clueId]);
+                        const displayVal = getDisplayValue(state, clueId);
+                        let className = used ? 'clueCell used' : 'clueCell';
+                        if (!used && isDD) className += ' dailyDoubleGlow';
+                        return (
+                          <td key={clueId}>
+                            <div
+                              role="button"
+                              tabIndex={0}
+                              className={className}
+                              onClick={() => (used ? null : onClueClick(categoryIndex, clueRowIdx))}
+                              onKeyDown={(e) => {
+                                if (used) return;
+                                if (e.key === 'Enter' || e.key === ' ') onClueClick(categoryIndex, clueRowIdx);
+                              }}
+                            >
+                              {used ? '·' : displayVal}
+                            </div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <div className="card">Waiting for board…</div>
           )}

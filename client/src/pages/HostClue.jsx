@@ -101,8 +101,8 @@ export default function HostClue() {
       {error ? <div style={{ color: 'var(--danger)', marginBottom: 12, fontSize: 13 }}>Socket: {error}</div> : null}
 
       {clue ? (
-        <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-          <div style={{ flex: 1, minWidth: 480 }}>
+        <div className="hostClueSplit">
+          <div className="hostClueMainPane">
             <div className="card hostClueCard" style={{ marginBottom: 12 }}>
               <div className="hostClueMeta">
                 {clue.categoryName} · {effectiveValue} pts{isDD ? ' (2×)' : ''}
@@ -136,7 +136,7 @@ export default function HostClue() {
             </div>
           </div>
 
-          <div style={{ width: 360 }}>
+          <div className="hostClueSidePane">
             <div className="card" style={{ marginBottom: 12 }}>
               <div style={{ fontWeight: 300, fontSize: 13, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--fg-dim)', marginBottom: 10 }}>
                 Buzz Order
