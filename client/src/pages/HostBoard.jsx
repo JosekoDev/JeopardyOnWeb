@@ -54,7 +54,8 @@ export default function HostBoard() {
     if (!state) return;
     const clueId = makeClueId(boardIndex, categoryIndex, clueIndex);
     if (Boolean(usedForBoard?.[clueId])) return;
-    playSfx('clue_clicked');
+    const isDailyDouble = Boolean(state?.dailyDoubles?.[clueId]);
+    if (!isDailyDouble) playSfx('clue_clicked');
     emit('host:selectClue', { clueId });
     navigate(`/host/${sessionId}/clue`);
   }
@@ -110,7 +111,8 @@ export default function HostBoard() {
             className="btn"
             type="button"
             onClick={() => {
-              playSfx('next_round');
+              const isLastBoard = boardIndex >= (state?.boards?.length ?? 1) - 1;
+              if (!isLastBoard) playSfx('next_round');
               emit('host:skipBoard');
             }}
             disabled={state?.gameOver}
