@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { getServerUrl } from '../lib/serverUrl';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || '';
+const SERVER_URL = getServerUrl();
 
 function normalizeCode(code) {
   return String(code || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');

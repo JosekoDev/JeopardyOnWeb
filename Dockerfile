@@ -16,6 +16,7 @@ COPY server/package*.json ./server/
 RUN cd server && npm ci --production
 
 COPY server/ ./server/
+COPY data/ ./data/
 # Copy built client to server public directory
 COPY --from=builder /app/client/dist ./server/public/
 

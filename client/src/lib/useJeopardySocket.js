@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { io } from 'socket.io-client';
+import { getServerUrl } from './serverUrl';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || '';
+const SERVER_URL = getServerUrl();
 
 export function useJeopardySocket({ sessionId, role, playerId }) {
   const socket = useMemo(() => {

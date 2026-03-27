@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getServerUrl } from '../lib/serverUrl';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || '';
+const SERVER_URL = getServerUrl();
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));

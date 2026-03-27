@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getServerUrl } from '../lib/serverUrl';
 
 function normalizeCode(code) {
   return String(code || '')
@@ -9,6 +10,7 @@ function normalizeCode(code) {
 }
 
 export default function LobbyCodeLanding() {
+  const SERVER_URL = getServerUrl();
   const navigate = useNavigate();
   const inputRef = useRef(null);
 
@@ -42,7 +44,6 @@ export default function LobbyCodeLanding() {
       if (normalized.length !== 6) return;
       setChecking(true);
       try {
-        const SERVER_URL = import.meta.env.VITE_SERVER_URL || '';
         const res = await fetch(`${SERVER_URL}/api/lobbies/${normalized}/exists`);
         const data = await res.json().catch(() => ({}));
         const exists = Boolean(data?.exists);
