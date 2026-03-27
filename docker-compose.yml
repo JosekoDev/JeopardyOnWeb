@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  jeopardy:
+    build: .
+    ports:
+      - "3010:3010"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --url http://jeopardy:3010
+    restart: unless-stopped
+    depends_on:
+      - jeopardy

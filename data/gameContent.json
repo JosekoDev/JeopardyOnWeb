@@ -1,0 +1,314 @@
+{
+  "boards": [
+    {
+      "multiplier": 1,
+      "categories": [
+        {
+          "name": "Bruh",
+          "clues": [
+            {
+              "value": 100,
+              "questionText": "This empire built the Colosseum.",
+              "answerText": "Rome"
+            },
+            {
+              "value": 200,
+              "questionText": "The Renaissance began in this country.",
+              "answerText": "Italy"
+            },
+            {
+              "value": 300,
+              "questionText": "The Magna Carta was signed in this year.",
+              "answerText": "1215"
+            },
+            {
+              "value": 400,
+              "questionText": "The Silk Road connected East and West between these civilizations.",
+              "answerText": "Many, including China and Rome"
+            },
+            {
+              "value": 500,
+              "questionText": "The fall of the Western Roman Empire is traditionally dated to this year.",
+              "answerText": "476"
+            }
+          ]
+        },
+        {
+          "name": "Science",
+          "clues": [
+            {
+              "value": 100,
+              "questionText": "H2O is the chemical formula for this substance.",
+              "answerText": "Water"
+            },
+            {
+              "value": 200,
+              "questionText": "Gas plants and people breathe in oxygen and breathe out this gas.",
+              "answerText": "Carbon dioxide"
+            },
+            {
+              "value": 300,
+              "questionText": "The speed of light is commonly denoted by the letter.",
+              "answerText": "c"
+            },
+            {
+              "value": 400,
+              "questionText": "The powerhouse of the cell is the mitochondrion, plural is.",
+              "answerText": "mitochondria"
+            },
+            {
+              "value": 500,
+              "questionText": "A Newton is a unit of this physical quantity.",
+              "answerText": "Force"
+            }
+          ]
+        },
+        {
+          "name": "Geography",
+          "clues": [
+            {
+              "value": 100,
+              "questionText": "The Amazon River flows through this country.",
+              "answerText": "Brazil"
+            },
+            {
+              "value": 200,
+              "questionText": "The Sahara is the world's largest desert on this continent.",
+              "answerText": "Africa"
+            },
+            {
+              "value": 300,
+              "questionText": "Mount Everest is located in this mountain range.",
+              "answerText": "The Himalayas"
+            },
+            {
+              "value": 400,
+              "questionText": "The capital of Canada is this city.",
+              "answerText": "Ottawa"
+            },
+            {
+              "value": 500,
+              "questionText": "The longest river in South America is the.",
+              "answerText": "Amazon"
+            }
+          ]
+        },
+        {
+          "name": "Sports",
+          "clues": [
+            {
+              "value": 100,
+              "questionText": "In basketball, a player scores 3 points for a shot from behind this line.",
+              "answerText": "The three-point line"
+            },
+            {
+              "value": 200,
+              "questionText": "Soccer is played with a ball and two teams of.",
+              "answerText": "11"
+            },
+            {
+              "value": 300,
+              "questionText": "In tennis, points progress 0, 15, 30, 40, then.",
+              "answerText": "Game"
+            },
+            {
+              "value": 400,
+              "questionText": "In baseball, a pitcher throws the ball toward the.",
+              "answerText": "Batter"
+            },
+            {
+              "value": 500,
+              "questionText": "The FIFA World Cup is held every.",
+              "answerText": "four years"
+            }
+          ]
+        },
+        {
+          "name": "Arts",
+          "clues": [
+            {
+              "value": 100,
+              "questionText": "Leonardo da Vinci painted this masterpiece.",
+              "answerText": "Mona Lisa"
+            },
+            {
+              "value": 200,
+              "questionText": "Mozart composed music in the classical era; he was born in this city.",
+              "answerText": "Salzburg"
+            },
+            {
+              "value": 300,
+              "questionText": "A triangle, square, and circle are examples of this category of shapes.",
+              "answerText": "Geometric figures"
+            },
+            {
+              "value": 400,
+              "questionText": "A book's author writes the story in this form called.",
+              "answerText": "Literature"
+            },
+            {
+              "value": 500,
+              "questionText": "The art movement known for breaking form into geometric pieces is called.",
+              "answerText": "Cubism"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "categories": [
+        {
+          "name": "Movies",
+          "clues": [
+            {
+              "value": 100,
+              "questionText": "This studio is known for animated films featuring mice and dreams.",
+              "answerText": "Disney"
+            },
+            {
+              "value": 200,
+              "questionText": "A film's script is often written in this format.",
+              "answerText": "Screenplay"
+            },
+            {
+              "value": 300,
+              "questionText": "The Oscar award is given for excellence in this category.",
+              "answerText": "Film"
+            },
+            {
+              "value": 400,
+              "questionText": "A sequel continues the story; a prequel shows events before the original, and a.",
+              "answerText": "Remake"
+            },
+            {
+              "value": 500,
+              "questionText": "A movie shown without sound is.",
+              "answerText": "Silent film"
+            }
+          ]
+        },
+        {
+          "name": "Tech",
+          "clues": [
+            {
+              "value": 100,
+              "questionText": "HTTP is an acronym for.",
+              "answerText": "HyperText Transfer Protocol"
+            },
+            {
+              "value": 200,
+              "questionText": "A byte is typically composed of this many bits.",
+              "answerText": "8"
+            },
+            {
+              "value": 300,
+              "questionText": "JavaScript runs in the browser via this engine.",
+              "answerText": "V8 (or browser JS engine)"
+            },
+            {
+              "value": 400,
+              "questionText": "Socket.IO is a library for real-time.",
+              "answerText": "web communication"
+            },
+            {
+              "value": 500,
+              "questionText": "SQL is used to work with this kind of data storage.",
+              "answerText": "Databases"
+            }
+          ]
+        },
+        {
+          "name": "Cooking",
+          "clues": [
+            {
+              "value": 100,
+              "questionText": "Bake at 350 degrees Fahrenheit is a common temperature in this unit system.",
+              "answerText": "Imperial (Fahrenheit)"
+            },
+            {
+              "value": 200,
+              "questionText": "Boil water in this type of pot.",
+              "answerText": "Saucepan"
+            },
+            {
+              "value": 300,
+              "questionText": "A teaspoon is one third of a tablespoon's volume.",
+              "answerText": "3 teaspoons"
+            },
+            {
+              "value": 400,
+              "questionText": "Sear meat briefly to develop flavor using high heat; this technique is.",
+              "answerText": "Searing"
+            },
+            {
+              "value": 500,
+              "questionText": "The process of heating food gently to cook through is.",
+              "answerText": "Simmering"
+            }
+          ]
+        },
+        {
+          "name": "Music",
+          "clues": [
+            {
+              "value": 100,
+              "questionText": "The staff is made of five horizontal lines called.",
+              "answerText": "lines"
+            },
+            {
+              "value": 200,
+              "questionText": "Tempo refers to the speed of music.",
+              "answerText": "speed"
+            },
+            {
+              "value": 300,
+              "questionText": "A scale starts and ends on the same note called the.",
+              "answerText": "tonic"
+            },
+            {
+              "value": 400,
+              "questionText": "A symphony is typically written for an.",
+              "answerText": "orchestra"
+            },
+            {
+              "value": 500,
+              "questionText": "The dynamic marking 'f' stands for.",
+              "answerText": "forte"
+            }
+          ]
+        },
+        {
+          "name": "Literature",
+          "clues": [
+            {
+              "value": 100,
+              "questionText": "A character's setting includes time and.",
+              "answerText": "place"
+            },
+            {
+              "value": 200,
+              "questionText": "In poetry, the repetition of a line is called.",
+              "answerText": "refrain"
+            },
+            {
+              "value": 300,
+              "questionText": "A haiku is traditionally a poem with three.",
+              "answerText": "lines"
+            },
+            {
+              "value": 400,
+              "questionText": "A novel is typically a longer work than a.",
+              "answerText": "short story"
+            },
+            {
+              "value": 500,
+              "questionText": "An anthology is a collection of writings by different.",
+              "answerText": "authors"
+            }
+          ]
+        }
+      ],
+      "multiplier": 2
+    }
+  ]
+}
