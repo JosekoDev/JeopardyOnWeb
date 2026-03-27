@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3010';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || '';
 
 export default function HostHome() {
   const navigate = useNavigate();

@@ -42,7 +42,7 @@ export default function LobbyCodeLanding() {
       if (normalized.length !== 6) return;
       setChecking(true);
       try {
-        const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3010';
+        const SERVER_URL = import.meta.env.VITE_SERVER_URL || '';
         const res = await fetch(`${SERVER_URL}/api/lobbies/${normalized}/exists`);
         const data = await res.json().catch(() => ({}));
         const exists = Boolean(data?.exists);

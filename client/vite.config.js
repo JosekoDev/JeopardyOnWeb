@@ -6,6 +6,13 @@ export default defineConfig({
   server: {
     port: 5174,
     strictPort: true,
+    proxy: {
+      '/api': 'http://localhost:3010',
+      '/socket.io': {
+        target: 'ws://localhost:3010',
+        ws: true,
+      },
+    },
   },
 });
 
