@@ -1,5 +1,5 @@
 # JeopardyOnWeb
-Aka. JeapordyMaxxing
+Aka. JeopardyMaxxing
 
 JeopardyMaxxing is a real-time multiplayer Jeopardy-style game for discord calls, game nights, and events.  
 A host creates a session, players join with a 6-character lobby code, and everyone stays synced live over websockets.
