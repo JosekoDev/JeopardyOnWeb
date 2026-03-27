@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getServerUrl } from '../lib/serverUrl';
+import { playSfx } from '../lib/sfx';
 
 const SERVER_URL = getServerUrl();
 
@@ -47,6 +48,7 @@ export default function JoinPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+      playSfx('username_success');
       navigate(`/p/${data.sessionId}/${data.playerId}`, { replace: true });
     } catch (err) {
       setError(err?.message || 'Failed to join.');

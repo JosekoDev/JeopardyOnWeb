@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { playSfx } from '../lib/sfx';
 
 /**
  * Podium component — animated 3-place reveal with confetti.
@@ -28,6 +29,7 @@ export default function Podium({ players, joinOrder, onReturn }) {
   const third = ranked[2] ?? null;
 
   useEffect(() => {
+    playSfx('rankings');
     const timers = [];
     timers.push(setTimeout(() => setPhase(1), 600));   // reveal 3rd
     timers.push(setTimeout(() => setPhase(2), 1800));  // reveal 2nd

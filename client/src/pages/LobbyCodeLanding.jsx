@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getServerUrl } from '../lib/serverUrl';
+import { playSfx } from '../lib/sfx';
 
 function normalizeCode(code) {
   return String(code || '')
@@ -56,12 +57,17 @@ export default function LobbyCodeLanding() {
         const exists = Boolean(data?.exists);
         if (cancelled) return;
         if (!exists) {
+          playSfx('lobby_fail');
           setError("Code doesn't exist");
           return;
         }
+        playSfx('lobby_success');
         navigate('/join', { state: { lobbyCode: normalized } });
       } catch (e) {
-        if (!cancelled) setError("Code doesn't exist");
+        if (!cancelled) {
+          playSfx('lobby_fail');
+          setError("Code doesn't exist");
+        }
       } finally {
         if (!cancelled) setChecking(false);
       }

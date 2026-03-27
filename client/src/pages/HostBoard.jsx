@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useJeopardySocket } from '../lib/useJeopardySocket';
 import { makeClueId, getDisplayValue } from '../lib/clues';
 import Podium from '../components/Podium';
+import { playSfx } from '../lib/sfx';
 
 function normalizeCode(code) {
   return String(code || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -20,10 +21,17 @@ export default function HostBoard() {
   const usedForBoard = state?.used?.[boardIndex] ?? {};
 
   const [lobbyCode, setLobbyCode] = useState(() => normalizeCode(location?.state?.lobbyCode));
+  const hadSummaryRef = useRef(false);
 
   useEffect(() => {
     if (state?.lobbyCode) setLobbyCode(state.lobbyCode);
   }, [state?.lobbyCode]);
+
+  useEffect(() => {
+    const showing = Boolean(state?.showingSummary && state?.lastClueDeltas);
+    if (showing && !hadSummaryRef.current) playSfx('round_done');
+    hadSummaryRef.current = showing;
+  }, [state?.showingSummary, state?.lastClueDeltas]);
 
   useEffect(() => {
     if (!state) return;
@@ -46,6 +54,7 @@ export default function HostBoard() {
     if (!state) return;
     const clueId = makeClueId(boardIndex, categoryIndex, clueIndex);
     if (Boolean(usedForBoard?.[clueId])) return;
+    playSfx('clue_clicked');
     emit('host:selectClue', { clueId });
     navigate(`/host/${sessionId}/clue`);
   }
@@ -77,7 +86,10 @@ export default function HostBoard() {
           className="btn"
           type="button"
           style={{ marginTop: 28, animationDelay: `${0.3 + joinOrder.length * 0.1 + 0.15}s`, animation: 'fadeInUp 0.4s var(--ease) backwards' }}
-          onClick={() => emit('host:nextAfterSummary')}
+          onClick={() => {
+            playSfx('next_round');
+            emit('host:nextAfterSummary');
+          }}
         >
           Next
         </button>
@@ -97,7 +109,10 @@ export default function HostBoard() {
           <button
             className="btn"
             type="button"
-            onClick={() => emit('host:skipBoard')}
+            onClick={() => {
+              playSfx('next_round');
+              emit('host:skipBoard');
+            }}
             disabled={state?.gameOver}
           >
             {boardIndex >= (state?.boards?.length ?? 1) - 1 ? 'End Game →' : 'Next Board →'}

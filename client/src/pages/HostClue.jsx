@@ -1,13 +1,17 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useJeopardySocket } from '../lib/useJeopardySocket';
 import { getClueFromState, getEffectiveValue } from '../lib/clues';
+import { playSfx } from '../lib/sfx';
 
 export default function HostClue() {
   const { sessionId } = useParams();
   const navigate = useNavigate();
 
   const { state, error, emit } = useJeopardySocket({ sessionId, role: 'host' });
+  const lastBuzzLenRef = useRef(0);
+  const hadDailyDoubleRevealRef = useRef(false);
+  const hadSummaryRef = useRef(false);
 
   useEffect(() => {
     if (!state) return;
@@ -36,6 +40,30 @@ export default function HostClue() {
       name: state?.players?.[pid]?.name ?? pid,
     }));
   }, [state]);
+
+  useEffect(() => {
+    const nextLen = state?.buzzOrder?.length ?? 0;
+    const prevLen = lastBuzzLenRef.current;
+    if (nextLen > prevLen) {
+      for (let i = prevLen + 1; i <= nextLen; i += 1) {
+        const key = `buzz${Math.min(i, 5)}`;
+        playSfx(key);
+      }
+    }
+    lastBuzzLenRef.current = nextLen;
+  }, [state?.buzzOrder?.length]);
+
+  useEffect(() => {
+    const isReveal = state?.dailyDoublePhase === 'reveal';
+    if (isReveal && !hadDailyDoubleRevealRef.current) playSfx('daily_double');
+    hadDailyDoubleRevealRef.current = isReveal;
+  }, [state?.dailyDoublePhase]);
+
+  useEffect(() => {
+    const showing = Boolean(state?.showingSummary && state?.lastClueDeltas);
+    if (showing && !hadSummaryRef.current) playSfx('round_done');
+    hadSummaryRef.current = showing;
+  }, [state?.showingSummary, state?.lastClueDeltas]);
 
   // Daily Double reveal splash
   if (state?.dailyDoublePhase === 'reveal') {
@@ -78,7 +106,10 @@ export default function HostClue() {
           className="btn"
           type="button"
           style={{ marginTop: 28, animation: 'fadeInUp 0.4s var(--ease) backwards', animationDelay: `${0.3 + (state.joinOrder?.length ?? 0) * 0.1 + 0.15}s` }}
-          onClick={() => emit('host:nextAfterSummary')}
+          onClick={() => {
+            playSfx('next_round');
+            emit('host:nextAfterSummary');
+          }}
         >
           Next
         </button>

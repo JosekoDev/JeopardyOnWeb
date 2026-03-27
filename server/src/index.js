@@ -249,7 +249,9 @@ app.get('/api/lobbies/:lobbyCode/exists', (req, res) => {
 
 // Serve frontend static files
 const clientPath = path.join(__dirname, '..', 'public');
+const audioPath = path.join(__dirname, '..', '..', 'audio');
 app.use(express.static(clientPath));
+app.use('/audio', express.static(audioPath));
 
 // Fallback for React Router (using RegExp to bypass path-to-regexp syntax errors in newer Express)
 app.get(/.*/, (req, res) => {
