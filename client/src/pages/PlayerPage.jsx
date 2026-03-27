@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useJeopardySocket } from '../lib/useJeopardySocket';
 import { getClueFromState, getDisplayValue, getEffectiveValue, makeClueId } from '../lib/clues';
 import Podium from '../components/Podium';
+import { playSfx } from '../lib/sfx';
 
 export default function PlayerPage() {
   const { sessionId, playerId } = useParams();
@@ -25,10 +26,48 @@ export default function PlayerPage() {
   }, [state]);
 
   const hasBuzzed = Boolean(me?.hasBuzzed);
+  const prevSelectedClueRef = useRef(null);
+  const prevSummaryRef = useRef(false);
+  const prevBuzzLenRef = useRef(0);
+  const prevDailyDoubleRef = useRef(false);
 
   const boardIndex = state?.currentBoardIndex ?? 0;
   const board = state?.boards?.[boardIndex];
   const usedForBoard = state?.used?.[boardIndex] ?? {};
+
+  useEffect(() => {
+    const selected = state?.selectedClueId ?? null;
+    const prev = prevSelectedClueRef.current;
+    if (selected && !prev) {
+      const isDailyDouble = Boolean(state?.dailyDoubles?.[selected]);
+      if (!isDailyDouble) playSfx('clue_clicked');
+    }
+    prevSelectedClueRef.current = selected;
+  }, [state?.selectedClueId, state?.dailyDoubles]);
+
+  useEffect(() => {
+    const isReveal = state?.dailyDoublePhase === 'reveal';
+    if (isReveal && !prevDailyDoubleRef.current) playSfx('daily_double');
+    prevDailyDoubleRef.current = isReveal;
+  }, [state?.dailyDoublePhase]);
+
+  useEffect(() => {
+    const showingSummary = Boolean(state?.showingSummary && state?.lastClueDeltas);
+    if (showingSummary && !prevSummaryRef.current) playSfx('round_done');
+    if (!showingSummary && prevSummaryRef.current && !state?.gameOver) playSfx('next_round');
+    prevSummaryRef.current = showingSummary;
+  }, [state?.showingSummary, state?.lastClueDeltas, state?.gameOver]);
+
+  useEffect(() => {
+    const nextLen = state?.buzzOrder?.length ?? 0;
+    const prevLen = prevBuzzLenRef.current;
+    if (nextLen > prevLen) {
+      for (let i = prevLen + 1; i <= nextLen; i += 1) {
+        playSfx(`buzz${Math.min(i, 5)}`);
+      }
+    }
+    prevBuzzLenRef.current = nextLen;
+  }, [state?.buzzOrder?.length]);
 
   if (state?.gameOver) {
     return <Podium players={state.players} joinOrder={state.joinOrder} onReturn={() => { window.location.href = '/'; }} />;

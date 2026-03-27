@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import { getServerUrl } from './serverUrl';
 
@@ -15,6 +15,7 @@ export function useJeopardySocket({ sessionId, role, playerId }) {
   const [state, setState] = useState(null);
   const [error, setError] = useState(null);
   const [connected, setConnected] = useState(false);
+  const pendingRef = useRef([]);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -22,11 +23,17 @@ export function useJeopardySocket({ sessionId, role, playerId }) {
     setError(null);
     setConnected(false);
     socket.connect();
-    socket.emit('client:join', { sessionId, role, playerId });
 
     const onUpdate = (nextState) => setState(nextState);
     const onError = (payload) => setError(payload?.error || 'Socket error');
-    const onConnect = () => setConnected(true);
+    const onConnect = () => {
+      setConnected(true);
+      socket.emit('client:join', { sessionId, role, playerId });
+      if (pendingRef.current.length) {
+        for (const item of pendingRef.current) socket.emit(item.event, item.payload);
+        pendingRef.current = [];
+      }
+    };
     const onConnectError = () => setError('Unable to connect to server');
     const onDisconnect = () => {
       // Avoid showing a disconnect error during unmount/disconnect cleanup.
@@ -53,6 +60,11 @@ export function useJeopardySocket({ sessionId, role, playerId }) {
 
   function emit(event, payload) {
     if (!socket) return;
+    if (!socket.connected) {
+      pendingRef.current.push({ event, payload });
+      socket.connect();
+      return;
+    }
     socket.emit(event, payload);
   }
 
