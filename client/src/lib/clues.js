@@ -26,6 +26,7 @@ export function getClueFromState(state, clueId) {
     ...parsed,
     categoryName: category.name,
     questionText: clue.questionText,
+    questionImageUrl: clue.questionImageUrl,
     answerText: clue.answerText,
     value: clue.value,
   };

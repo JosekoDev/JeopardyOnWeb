@@ -13,6 +13,15 @@ function clampIndex(value, length) {
   return value;
 }
 
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(new Error('Failed to read image file'));
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function EditorPage() {
   const navigate = useNavigate();
   const [content, setContent] = useState(null);
@@ -110,6 +119,19 @@ export default function EditorPage() {
       setError(err?.message || 'Failed to save content');
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function onQuestionImageFileChange(e) {
+    const file = e.target.files?.[0];
+    if (!file || !content || !category || !clue) return;
+    try {
+      const dataUrl = await readFileAsDataUrl(file);
+      updateClue(boardIndex, categoryIndex, clueIndex, { questionImageUrl: dataUrl });
+    } catch (err) {
+      setError(err?.message || 'Failed to load image');
+    } finally {
+      e.target.value = '';
     }
   }
 
@@ -279,6 +301,39 @@ export default function EditorPage() {
                     onChange={(e) => updateClue(boardIndex, categoryIndex, clueIndex, { answerText: e.target.value })}
                   />
                 </section>
+              </div>
+
+              <div className="editorWorkbenchTextSection">
+                <label className="editorWorkbenchLabel" htmlFor="editor-question-image-url">Question Image URL</label>
+                <input
+                  id="editor-question-image-url"
+                  type="text"
+                  placeholder="https://... or leave blank"
+                  value={clue.questionImageUrl ?? ''}
+                  onChange={(e) => updateClue(boardIndex, categoryIndex, clueIndex, { questionImageUrl: e.target.value })}
+                />
+              </div>
+
+              <div className="editorWorkbenchTextSection">
+                <label className="editorWorkbenchLabel" htmlFor="editor-question-image-file">Upload Question Image</label>
+                <input
+                  id="editor-question-image-file"
+                  type="file"
+                  accept="image/*"
+                  onChange={onQuestionImageFileChange}
+                />
+                {clue.questionImageUrl ? (
+                  <div className="editorQuestionImagePreviewWrap">
+                    <img className="editorQuestionImagePreview" src={clue.questionImageUrl} alt="Question preview" />
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => updateClue(boardIndex, categoryIndex, clueIndex, { questionImageUrl: '' })}
+                    >
+                      Remove Image
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </>
           ) : (

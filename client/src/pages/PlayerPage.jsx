@@ -130,12 +130,17 @@ export default function PlayerPage() {
               {clue?.categoryName} · {effectiveValue}
             </div>
             <div className="playerClueBody">
-              <div className="playerClueText">
-                {state?.answerRevealed
-                  ? clue?.answerText?.trim()
-                    ? clue.answerText
-                    : '—'
-                  : clue?.questionText}
+              <div className={'playerClueContent clueQuestionLayout' + (!state?.answerRevealed && clue?.questionImageUrl ? ' hasImage' : '')}>
+                <div className="playerClueText">
+                  {state?.answerRevealed
+                    ? clue?.answerText?.trim()
+                      ? clue.answerText
+                      : '—'
+                    : clue?.questionText}
+                </div>
+                {!state?.answerRevealed && clue?.questionImageUrl ? (
+                  <img className="clueQuestionImage" src={clue.questionImageUrl} alt="Question visual" />
+                ) : null}
               </div>
             </div>
           </div>

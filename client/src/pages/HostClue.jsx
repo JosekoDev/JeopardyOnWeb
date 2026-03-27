@@ -138,7 +138,12 @@ export default function HostClue() {
               <div className="hostClueMeta">
                 {clue.categoryName} · {effectiveValue} pts{isDD ? ' (2×)' : ''}
               </div>
-              <div className="hostClueText">{clue.questionText}</div>
+              <div className={'clueQuestionLayout' + (clue.questionImageUrl ? ' hasImage' : '')}>
+                <div className="hostClueText">{clue.questionText}</div>
+                {clue.questionImageUrl ? (
+                  <img className="clueQuestionImage" src={clue.questionImageUrl} alt="Question visual" />
+                ) : null}
+              </div>
             </div>
 
             <div className="card hostAnswerCard" style={{ marginBottom: 12 }}>
