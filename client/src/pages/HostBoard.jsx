@@ -57,7 +57,6 @@ export default function HostBoard() {
     const isDailyDouble = Boolean(state?.dailyDoubles?.[clueId]);
     if (!isDailyDouble) playSfx('clue_clicked');
     emit('host:selectClue', { clueId });
-    navigate(`/host/${sessionId}/clue`);
   }
 
   if (state?.gameOver) {
