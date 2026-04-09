@@ -26,6 +26,7 @@ export default function PlayerPage() {
   }, [state]);
 
   const hasBuzzed = Boolean(me?.hasBuzzed);
+  const buzzLockedOut = Boolean(me?.buzzLockedOut);
   const prevSelectedClueRef = useRef(null);
   const prevSummaryRef = useRef(false);
   const prevBuzzLenRef = useRef(0);
@@ -146,22 +147,39 @@ export default function PlayerPage() {
           </div>
 
           <div className="playerBuzzCard">
-            <button
-              className={
-                'playerBuzzBtn' +
-                (state?.buzzEnabled && !hasBuzzed ? ' enabled' : '') +
-                (hasBuzzed ? ' used' : '')
-              }
-              type="button"
-              onClick={() => emit('player:buzz')}
-              disabled={!state?.buzzEnabled || hasBuzzed}
-            >
-              {hasBuzzed ? 'BUZZED' : 'BUZZ'}
-            </button>
+            <div className={'playerBuzzBtnWrap' + (buzzLockedOut ? ' playerBuzzBtnWrap--caged' : '')}>
+              <button
+                className={
+                  'playerBuzzBtn' +
+                  (state?.buzzEnabled && !hasBuzzed && !buzzLockedOut ? ' enabled' : '') +
+                  (hasBuzzed ? ' used' : '')
+                }
+                type="button"
+                onClick={() => emit('player:buzz')}
+                disabled={hasBuzzed || buzzLockedOut || state?.answerRevealed}
+              >
+                {hasBuzzed ? 'BUZZED' : 'BUZZ'}
+              </button>
+              {buzzLockedOut ? (
+                <div className="playerBuzzCage" aria-hidden="true">
+                  <div className="playerBuzzCageRail playerBuzzCageRail--top" />
+                  <div className="playerBuzzCageRail playerBuzzCageRail--bottom" />
+                  <div className="playerBuzzCageBars">
+                    {Array.from({ length: 7 }).map((_, i) => (
+                      <span key={i} className="playerBuzzCageBar" style={{ animationDelay: `${i * 0.055}s` }} />
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
             <div className="playerBuzzHint">
-              {state?.buzzEnabled
-                ? hasBuzzed ? 'You buzzed in.' : 'Tap to buzz in.'
-                : 'Waiting for host to open buzzer.'}
+              {buzzLockedOut
+                ? 'You buzzed before the buzzer opened — you cannot buzz in on this clue.'
+                : state?.buzzEnabled
+                  ? hasBuzzed
+                    ? 'You buzzed in.'
+                    : 'Tap to buzz in.'
+                  : 'Waiting for host to open buzzer.'}
             </div>
           </div>
         </div>

@@ -227,6 +227,8 @@ app.post('/api/lobbies/join', (req, res) => {
       color: '#111111',
       connected: false,
       hasBuzzed: false,
+      buzzLockedOut: false,
+      roundTripMs: null,
       score: 0,
     };
     if (!Array.isArray(session.joinOrder)) session.joinOrder = [];
@@ -258,6 +260,35 @@ app.get(/.*/, (req, res) => {
   res.sendFile(path.join(clientPath, 'index.html'));
 });
 
+const DEFAULT_RTT_MS = 150;
+const RTT_CLAMP_MIN = 20;
+const RTT_CLAMP_MAX = 800;
+
+function halfRoundTripMsForPlayer(player) {
+  const r = Number(player?.roundTripMs);
+  const ms = Number.isFinite(r) && r > 0 ? r : DEFAULT_RTT_MS;
+  const clamped = Math.min(RTT_CLAMP_MAX, Math.max(RTT_CLAMP_MIN, ms));
+  return clamped / 2;
+}
+
+/** Latency-equalized buzz ordering: earlier effective time = rang in first. */
+function registerLatencyEqualizedBuzz(session, playerId, recvTime) {
+  if (!session.buzzEffectiveTimes) session.buzzEffectiveTimes = {};
+  const player = session.players[playerId];
+  const effective = recvTime - halfRoundTripMsForPlayer(player);
+  session.buzzEffectiveTimes[playerId] = effective;
+
+  if (!session.buzzOrder.includes(playerId)) {
+    session.buzzOrder.push(playerId);
+  }
+  session.buzzOrder.sort((a, b) => {
+    const ta = session.buzzEffectiveTimes[a] ?? recvTime;
+    const tb = session.buzzEffectiveTimes[b] ?? recvTime;
+    if (ta !== tb) return ta - tb;
+    return String(a).localeCompare(String(b));
+  });
+}
+
 function serializeState(session) {
   return {
     lobbyCode: session.lobbyCode,
@@ -266,6 +297,7 @@ function serializeState(session) {
     selectedClueId: session.selectedClueId,
     buzzEnabled: session.buzzEnabled,
     buzzOrder: session.buzzOrder,
+    buzzOpenedAt: session.buzzOpenedAt ?? null,
     answerRevealed: Boolean(session.answerRevealed),
     players: session.players,
     boards: session.boards,
@@ -420,14 +452,50 @@ io.on('connection', (socket) => {
 
     const session = sessions.get(sessionId);
     if (!session) return;
-    if (!session.selectedClueId || !session.buzzEnabled) return;
+    if (!session.selectedClueId) return;
+    if (session.answerRevealed) return;
 
     const player = session.players[playerId];
     if (!player || player.hasBuzzed) return;
+    if (player.buzzLockedOut) return;
 
+    if (!session.buzzEnabled) {
+      player.buzzLockedOut = true;
+      io.to(sessionId).emit('state:update', serializeState(session));
+      return;
+    }
+
+    const recvTime = Date.now();
     player.hasBuzzed = true;
-    session.buzzOrder.push(playerId);
+    registerLatencyEqualizedBuzz(session, playerId, recvTime);
     io.to(sessionId).emit('state:update', serializeState(session));
+  });
+
+  socket.on('player:ping', (payload, cb) => {
+    const { role } = socket.data ?? {};
+    if (role !== 'player') return;
+    if (typeof cb === 'function') {
+      cb({ serverTime: Date.now(), clientTime: payload?.clientTime });
+    }
+  });
+
+  socket.on('player:rtt', ({ rttMs } = {}) => {
+    const { sessionId, role, playerId } = socket.data ?? {};
+    if (role !== 'player' || !playerId) return;
+    const session = sessions.get(sessionId);
+    if (!session) return;
+    const player = session.players[playerId];
+    if (!player) return;
+
+    let sample = Number(rttMs);
+    if (!Number.isFinite(sample)) return;
+    sample = Math.min(RTT_CLAMP_MAX, Math.max(RTT_CLAMP_MIN, sample));
+
+    const prev = player.roundTripMs;
+    player.roundTripMs =
+      prev == null || !Number.isFinite(Number(prev))
+        ? sample
+        : 0.65 * Number(prev) + 0.35 * sample;
   });
 
   socket.on('disconnect', () => {

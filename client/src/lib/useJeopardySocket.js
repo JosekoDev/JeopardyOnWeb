@@ -58,6 +58,23 @@ export function useJeopardySocket({ sessionId, role, playerId }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, role, playerId]);
 
+  useEffect(() => {
+    if (!sessionId || role !== 'player' || !playerId || !connected) return;
+
+    function sendPing() {
+      const clientTime = Date.now();
+      socket.emit('player:ping', { clientTime }, (resp) => {
+        if (resp == null) return;
+        const rtt = Date.now() - clientTime;
+        socket.emit('player:rtt', { rttMs: rtt });
+      });
+    }
+
+    sendPing();
+    const id = setInterval(sendPing, 2500);
+    return () => clearInterval(id);
+  }, [sessionId, role, playerId, connected, socket]);
+
   function emit(event, payload) {
     if (!socket) return;
     if (!socket.connected) {

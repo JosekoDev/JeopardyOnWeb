@@ -601,6 +601,103 @@ body {
   animation: slideInFromBottom 0.5s var(--ease) 0.2s backwards;
 }
 
+.playerBuzzBtnWrap {
+  position: relative;
+  width: 100%;
+  max-width: 416px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.playerBuzzCage {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.playerBuzzCageRail {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  height: 5px;
+  border-radius: 3px;
+  background-color: var(--fg-dim);
+  opacity: 0.88;
+  transform-origin: center;
+  animation: playerBuzzCageRailIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.playerBuzzCageRail--top {
+  top: 10%;
+}
+
+.playerBuzzCageRail--bottom {
+  bottom: 10%;
+  animation-delay: 0.08s;
+}
+
+.playerBuzzCageBars {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 16%;
+  bottom: 16%;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.playerBuzzCageBar {
+  flex: 0 0 clamp(3px, 1.1vw, 5px);
+  border-radius: 2px;
+  background-color: var(--fg-dim);
+  opacity: 0.9;
+  transform-origin: top center;
+  animation: playerBuzzCageBarSlam 0.48s cubic-bezier(0.25, 0.9, 0.35, 1) backwards;
+}
+
+@keyframes playerBuzzCageRailIn {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes playerBuzzCageBarSlam {
+  from {
+    transform: scaleY(0);
+    opacity: 0.85;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .playerBuzzCageRail,
+  .playerBuzzCageBar {
+    animation: none !important;
+  }
+
+  .playerBuzzCageRail {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+
+  .playerBuzzCageBar {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
 .playerBuzzBtn {
   font-family: var(--font-buzzer);
   width: 100%;

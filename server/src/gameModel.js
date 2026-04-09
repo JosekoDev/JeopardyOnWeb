@@ -53,6 +53,8 @@ function createSession(sessionId, contentSnapshot) {
     selectedClueId: null,
     buzzEnabled: false,
     buzzOrder: [],
+    buzzEffectiveTimes: {}, // { playerId: number } — server receive time minus half RTT (latency-equalized ordering)
+    buzzOpenedAt: null, // ms since epoch when buzzer opened (optional diagnostics)
     answerRevealed: false,
 
     // Daily Double
@@ -139,6 +141,8 @@ function selectClue(session, clueId) {
   session.selectedClueId = clueId;
   session.buzzEnabled = false;
   session.buzzOrder = [];
+  session.buzzEffectiveTimes = {};
+  session.buzzOpenedAt = null;
   session.answerRevealed = false;
   session.lastClueDeltas = null;
   session.showingSummary = false;
@@ -151,7 +155,10 @@ function selectClue(session, clueId) {
 
   // Reset per-player buzzes
   for (const pid of Object.keys(session.players ?? {})) {
-    if (session.players[pid]) session.players[pid].hasBuzzed = false;
+    if (session.players[pid]) {
+      session.players[pid].hasBuzzed = false;
+      session.players[pid].buzzLockedOut = false;
+    }
   }
 
   // If daily double, enter reveal phase
@@ -175,6 +182,7 @@ function advanceDailyDouble(session) {
 function finishReading(session) {
   if (!session.selectedClueId) return { ok: false, error: 'No clue selected' };
   session.buzzEnabled = true;
+  session.buzzOpenedAt = Date.now();
   return { ok: true };
 }
 
@@ -198,6 +206,8 @@ function done(session) {
   session.selectedClueId = null;
   session.buzzEnabled = false;
   session.buzzOrder = [];
+  session.buzzEffectiveTimes = {};
+  session.buzzOpenedAt = null;
   session.answerRevealed = false;
   session.dailyDoublePhase = null;
   session.lastClueDeltas = deltas;
@@ -230,9 +240,14 @@ function nextAfterSummary(session) {
 
 function resetBuzz(session) {
   session.buzzOrder = [];
+  session.buzzEffectiveTimes = {};
   session.buzzEnabled = true;
+  session.buzzOpenedAt = Date.now();
   for (const pid of Object.keys(session.players ?? {})) {
-    if (session.players[pid]) session.players[pid].hasBuzzed = false;
+    if (session.players[pid]) {
+      session.players[pid].hasBuzzed = false;
+      session.players[pid].buzzLockedOut = false;
+    }
   }
   return { ok: true };
 }
@@ -250,6 +265,8 @@ function skipToNextBoard(session) {
     session.selectedClueId = null;
     session.buzzEnabled = false;
     session.buzzOrder = [];
+    session.buzzEffectiveTimes = {};
+    session.buzzOpenedAt = null;
     session.answerRevealed = false;
     session.dailyDoublePhase = null;
     session.lastClueDeltas = null;
@@ -261,6 +278,8 @@ function skipToNextBoard(session) {
   session.selectedClueId = null;
   session.buzzEnabled = false;
   session.buzzOrder = [];
+  session.buzzEffectiveTimes = {};
+  session.buzzOpenedAt = null;
   session.answerRevealed = false;
   session.dailyDoublePhase = null;
   session.lastClueDeltas = null;
